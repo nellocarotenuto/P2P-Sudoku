@@ -8,6 +8,50 @@
     <artifactId>p2p-sudoku</artifactId>
     <version>1.0-SNAPSHOT</version>
 
+    <description>
+        A DHT-based P2P Sudoku challenge game.
 
+        Players can place numbers in the board: if the number isn't already placed the player takes 1 point,
+        if it is already placed and the number is correct he takes 0 points, otherwise a point is dropped from his
+        score.
+
+        The game is based on 9 by 9 matrix.
+
+        All players participating to a game are automatically informed when a user increment his score and when
+        the game is finished.
+    </description>
+
+    <repositories>
+        <repository>
+            <id>tomp2p.net</id>
+            <url>http://tomp2p.net/dev/mvn/</url>
+        </repository>
+    </repositories>
+
+    <dependencies>
+        <dependency>
+            <groupId>net.tomp2p</groupId>
+            <artifactId>tomp2p-all</artifactId>
+            <version>5.0-Beta8</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.javatuples</groupId>
+            <artifactId>javatuples</artifactId>
+            <version>1.2</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>
