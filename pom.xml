@@ -6,19 +6,23 @@
 
     <groupId>com.github.nellocarotenuto</groupId>
     <artifactId>p2p-sudoku</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0</version>
+    <packaging>jar</packaging>
 
     <description>
-        A DHT-based P2P Sudoku challenge game.
+        A DHT-based P2P Sudoku challenge multiplayer game.
 
-        Players can place numbers in the board: if the number isn't already placed the player takes 1 point,
-        if it is already placed and the number is correct he takes 0 points, otherwise a point is dropped from his
-        score.
+        This game allows players to challenge each other on a variety of Sudoku puzzles. Each player can create his/her
+        own challenge and wait for other players to join in order to compete with them. Every player participating at a
+        challenge has the same board at the beginning, but only the numbers he/she places are shown as the game goes on.
 
-        The game is based on 9 by 9 matrix.
+        Every time a player places a number in a challenge, his/her score is updated is updated within that challenge
+        with the following rules: the player earns 1 point if he's the first one in that challenge to have placed that
+        particular number, 0 points if the number is correct but another player found it earlier and -1 points if the
+        number isn't correct.  No one can see the common board of a challenge but every player is informed as others'
+        scores change.
 
-        All players participating to a game are automatically informed when a user increment his score and when
-        the game is finished.
+        Each challenge ends as soon as one player has completed his own board.
     </description>
 
     <repositories>
@@ -30,6 +34,24 @@
 
     <dependencies>
         <dependency>
+            <groupId>args4j</groupId>
+            <artifactId>args4j</artifactId>
+            <version>2.33</version>
+        </dependency>
+
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.2.3</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.googlecode.lanterna</groupId>
+            <artifactId>lanterna</artifactId>
+            <version>3.0.1</version>
+        </dependency>
+
+        <dependency>
             <groupId>net.tomp2p</groupId>
             <artifactId>tomp2p-all</artifactId>
             <version>5.0-Beta8</version>
@@ -39,6 +61,18 @@
             <groupId>org.javatuples</groupId>
             <artifactId>javatuples</artifactId>
             <version>1.2</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.29</version>
+        </dependency>
+
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-core</artifactId>
+            <version>1.2.3</version>
         </dependency>
     </dependencies>
 
@@ -50,6 +84,33 @@
                     <source>1.8</source>
                     <target>1.8</target>
                 </configuration>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.2.0</version>
+                <configuration>
+                    <appendAssemblyId>false</appendAssemblyId>
+
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                            <mainClass>com.github.nellocarotenuto.p2psudoku.gui.Console</mainClass>
+                        </manifest>
+                    </archive>
+
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

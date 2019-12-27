@@ -1,0 +1,43 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="P2P-Sudoku:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/P2P_Sudoku_jar</output-path>
+    <root id="archive" name="P2P-Sudoku.jar">
+      <element id="module-output" name="P2P-Sudoku" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/net/tomp2p/tomp2p-tracker/5.0-Beta8/tomp2p-tracker-5.0-Beta8.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/jhlabs/filters/2.0.235-1/filters-2.0.235-1.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/javatuples/javatuples/1.2/javatuples-1.2.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/net/tomp2p/tomp2p-dht/5.0-Beta8/tomp2p-dht-5.0-Beta8.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/jetbrains/annotations/13.0/annotations-13.0.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/hexworks/zircon/zircon.jvm.swing/2019.1.2-PREVIEW/zircon.jvm.swing-2019.1.2-PREVIEW.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/jetbrains/kotlin/kotlin-stdlib-jdk7/1.3.40/kotlin-stdlib-jdk7-1.3.40.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/net/tomp2p/tomp2p-nat/5.0-Beta8/tomp2p-nat-5.0-Beta8.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/hexworks/cobalt/cobalt.events-jvm/2019.1.0-PREVIEW/cobalt.events-jvm-2019.1.0-PREVIEW.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/hexworks/cobalt/cobalt.logging-jvm/2019.1.0-PREVIEW/cobalt.logging-jvm-2019.1.0-PREVIEW.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/ch/qos/logback/logback-core/1.2.3/logback-core-1.2.3.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/jetbrains/kotlin/kotlin-stdlib-jdk8/1.3.40/kotlin-stdlib-jdk8-1.3.40.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/mapdb/mapdb/1.0.6/mapdb-1.0.6.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/io/netty/netty-buffer/4.0.28.Final/netty-buffer-4.0.28.Final.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/jetbrains/kotlin/kotlin-reflect/1.3.40/kotlin-reflect-1.3.40.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/net/tomp2p/tomp2p-replication/5.0-Beta8/tomp2p-replication-5.0-Beta8.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/net/tomp2p/tomp2p-android/5.0-Beta8/tomp2p-android-5.0-Beta8.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/slf4j/slf4j-api/1.7.25/slf4j-api-1.7.25.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/ch/qos/logback/logback-classic/1.2.3/logback-classic-1.2.3.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/hexworks/cobalt/cobalt.databinding-jvm/2019.1.0-PREVIEW/cobalt.databinding-jvm-2019.1.0-PREVIEW.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/net/tomp2p/tomp2p-all/5.0-Beta8/tomp2p-all-5.0-Beta8.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/io/netty/netty-common/4.0.28.Final/netty-common-4.0.28.Final.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/yaml/snakeyaml/1.18/snakeyaml-1.18.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/net/tomp2p/tomp2p-storage/5.0-Beta8/tomp2p-storage-5.0-Beta8.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/googlecode/json-simple/json-simple/1.1/json-simple-1.1.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/net/tomp2p/tomp2p-core/5.0-Beta8/tomp2p-core-5.0-Beta8.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/hexworks/zircon/zircon.core-jvm/2019.1.2-PREVIEW/zircon.core-jvm-2019.1.2-PREVIEW.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/jetbrains/kotlinx/kotlinx-coroutines-core/1.2.1/kotlinx-coroutines-core-1.2.1.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/ganyo/gcm-server/1.0.2/gcm-server-1.0.2.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/jetbrains/kotlin/kotlin-stdlib/1.3.40/kotlin-stdlib-1.3.40.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/io/netty/netty-transport/4.0.28.Final/netty-transport-4.0.28.Final.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/jetbrains/kotlin/kotlin-stdlib-common/1.3.40/kotlin-stdlib-common-1.3.40.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/bitlet/weupnp/0.1.2/weupnp-0.1.2.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/github/ben-manes/caffeine/caffeine/2.5.4/caffeine-2.5.4.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/hexworks/cobalt/cobalt.datatypes-jvm/2019.1.0-PREVIEW/cobalt.datatypes-jvm-2019.1.0-PREVIEW.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>
