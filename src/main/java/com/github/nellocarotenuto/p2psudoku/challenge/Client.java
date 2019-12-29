@@ -1,7 +1,5 @@
 package com.github.nellocarotenuto.p2psudoku.challenge;
 
-import com.github.nellocarotenuto.p2psudoku.sudoku.FilledCellException;
-import com.github.nellocarotenuto.p2psudoku.sudoku.Sudoku;
 import com.github.nellocarotenuto.p2psudoku.utils.ElementAlreadyExistsException;
 import com.github.nellocarotenuto.p2psudoku.utils.ElementNotFoundException;
 import com.github.nellocarotenuto.p2psudoku.utils.FailedOperationException;
@@ -40,9 +38,6 @@ public class Client {
 
     private static final int MAX_SYNC_ATTEMPTS = 10;
 
-    private static final String NICKNAME_FORMAT = "^[a-zA-Z0-9._-]{3,24}$";
-    private static final String GAME_NAME_FORMAT = "^([a-zA-Z0-9]+( [a-zA-Z0-9]+)*){3,24}$";
-
     public static int DEFAULT_PORT = 4001;
 
     private Peer peer;
@@ -51,7 +46,7 @@ public class Client {
     private Random random;
 
     private Player player;
-    private List<Info> challenges;
+    private List<ChallengeInfo> challenges;
     private Challenge challenge;
 
     public Client(InetAddress masterAddress, int masterPort, int localPort) throws Exception {
@@ -59,20 +54,22 @@ public class Client {
         random = new Random();
 
         // Define the peer and the DHT
-        peer = new PeerBuilder(Number160.createHash(random.nextInt())).ports(localPort).start();
+        peer = new PeerBuilder(new Number160(random)).ports(localPort).start();
         dht = new PeerBuilderDHT(peer).start();
 
         // Bootstrap to master peer
-        FutureBootstrap bootstrap = peer.bootstrap()
-                .inetAddress(masterAddress)
-                .ports(masterPort)
-                .start();
-        bootstrap.awaitUninterruptibly();
+        if (!InetAddress.getLocalHost().equals(masterAddress) || masterPort != localPort) {
+            FutureBootstrap bootstrap = peer.bootstrap()
+                    .inetAddress(masterAddress)
+                    .ports(masterPort)
+                    .start();
+            bootstrap.awaitUninterruptibly();
 
-        if (bootstrap.isSuccess()) {
-            peer.discover().peerAddress(bootstrap.bootstrapTo().iterator().next()).start().awaitUninterruptibly();
-        } else {
-            throw new RuntimeException("Unable to bootstrap to " + masterAddress.getHostAddress() + ":" + DEFAULT_PORT + ".");
+            if (bootstrap.isSuccess()) {
+                peer.discover().peerAddress(bootstrap.bootstrapTo().iterator().next()).start().awaitUninterruptibly();
+            } else {
+                throw new RuntimeException("Unable to bootstrap to " + masterAddress.getHostAddress() + ":" + masterPort + ".");
+            }
         }
 
         // Initialize the list of players if it doesn't already exist in the DHT
@@ -87,7 +84,7 @@ public class Client {
         try {
             PeerDHTUtils.get(dht, Number160.ONE);
         } catch (ElementNotFoundException e) {
-            List<Info> challenges = new ArrayList<>();
+            List<ChallengeInfo> challenges = new ArrayList<>();
             PeerDHTUtils.create(dht, Number160.ONE, new Data(challenges));
         }
 
@@ -125,7 +122,7 @@ public class Client {
             throw new RuntimeException("Already logged in.");
         }
 
-        if (!nickname.matches(NICKNAME_FORMAT)) {
+        if (!nickname.matches(Challenge.NICKNAME_FORMAT)) {
             throw new InvalidNicknameException("A nickname must be at least 3 characters long and only contain " +
                                                "letters, numbers, dashes, dots or underscores.");
         }
@@ -243,7 +240,7 @@ public class Client {
      * @param listed true if the challenge is to be public, false otherwise
      *
      * @throws ChallengeAlreadyExistsException if a challenge with the same name already exists
-     * @throws InvalidNameException if the name chosen doesn't match the pattern
+     * @throws InvalidChallengeNameException if the name chosen doesn't match the pattern
      */
     public void createChallenge(String name, int seed, boolean listed) throws Exception {
         if (player == null) {
@@ -252,11 +249,6 @@ public class Client {
 
         if (challenge != null) {
             throw new RuntimeException("Unable to create a new challenge when already participating to another one.");
-        }
-
-        if (!name.matches(GAME_NAME_FORMAT)) {
-            throw new InvalidNameException("A game name must be at least 3 characters long and only contain " +
-                                           "letters, numbers, dashes, dots and underscores.");
         }
 
         Challenge challenge = new Challenge(player, name, seed, listed);
@@ -296,7 +288,7 @@ public class Client {
      *
      * @return the list of public challenges available in the system
      */
-    public List<Info> listChallenges() {
+    public List<ChallengeInfo> listChallenges() {
         return challenges;
     }
 
@@ -433,14 +425,6 @@ public class Client {
             throw new RuntimeException("Unable to start a challenge if not participating to one.");
         }
 
-        if (challenge.getStatus() != Challenge.Status.WAITING) {
-            throw new RuntimeException("Unable to start a challenge if it already was earlier.");
-        }
-
-        if (!player.equals(challenge.getOwner())) {
-            throw new UnauthorizedOperationException("The challenge can only be started by the owner.");
-        }
-
         Challenge challenge = null;
 
         for (int attempt = 0; attempt < MAX_SYNC_ATTEMPTS; attempt++) {
@@ -449,7 +433,7 @@ public class Client {
                 Number640 key = entry.element0();
                 challenge = (Challenge) entry.element1().object();
 
-                challenge.setStatus(Challenge.Status.PLAYING);
+                challenge.start(player);
 
                 PeerDHTUtils.update(dht, new Pair<>(key, new Data(challenge)));
                 this.challenge = challenge;
@@ -489,18 +473,6 @@ public class Client {
             throw new RuntimeException("Unable to place a number if not participating to a challenge.");
         }
 
-        if (challenge.getStatus() != Challenge.Status.PLAYING) {
-            throw new ChallengeStatusException("Unable to place a number if the challenge has ended or not yet started.");
-        }
-
-        if (row < 0 || row >= Sudoku.SIDE_SIZE || column < 0 || column >= Sudoku.SIDE_SIZE) {
-            throw new CellNotFoundException("Cell (" + row + ", " + column + ") doesn't belong to the board.");
-        }
-
-        if (challenge.getBoard(player)[row][column] != 0) {
-            throw new FilledCellException("Cell (" + row + ", " + column + ") is already fixed.");
-        }
-
         for (int attempt = 0; attempt < MAX_SYNC_ATTEMPTS; attempt++) {
             try {
                 Pair<Number640, Data> entry = PeerDHTUtils.get(dht, Number160.createHash(this.challenge.getName()));
@@ -509,8 +481,6 @@ public class Client {
 
                 try {
                     challenge.placeNumber(player, row, column, number);
-                } catch (FilledCellException e) {
-                    throw new GuessedNumberException();
                 } finally {
                     PeerDHTUtils.update(dht, new Pair<>(key, new Data(challenge)));
                     this.challenge = challenge;
@@ -633,7 +603,7 @@ public class Client {
      *
      * @return the status of the current challenge
      */
-    public Challenge.Status getChallengeStatus() {
+    public ChallengeStatus getChallengeStatus() {
         if (challenge == null) {
             throw new RuntimeException("Unable to get the game status if not participating to any challenge.");
         }
@@ -663,7 +633,7 @@ public class Client {
             try {
                 Pair<Number640, Data> entry = PeerDHTUtils.get(dht, Number160.ONE);
                 Number640 key = entry.element0();
-                List<Info> challenges = (List<Info>) entry.element1().object();
+                List<ChallengeInfo> challenges = (List<ChallengeInfo>) entry.element1().object();
 
                 challenges.add(challenge.getInfo());
 
@@ -698,7 +668,7 @@ public class Client {
             try {
                 Pair<Number640, Data> entry = PeerDHTUtils.get(dht, Number160.ONE);
                 Number640 key = entry.element0();
-                List<Info> challenges = (List<Info>) entry.element1().object();
+                List<ChallengeInfo> challenges = (List<ChallengeInfo>) entry.element1().object();
 
                 int index = challenges.indexOf(challenge.getInfo());
                 challenges.set(index, challenge.getInfo());
@@ -734,7 +704,7 @@ public class Client {
             try {
                 Pair<Number640, Data> entry = PeerDHTUtils.get(dht, Number160.ONE);
                 Number640 key = entry.element0();
-                List<Info> challenges = (List<Info>) entry.element1().object();
+                List<ChallengeInfo> challenges = (List<ChallengeInfo>) entry.element1().object();
 
                 challenges.remove(challenge.getInfo());
 
@@ -827,7 +797,7 @@ public class Client {
         for (int attempt = 0; attempt < MAX_SYNC_ATTEMPTS; attempt++) {
             try {
                 Pair<Number640, Data> entry = PeerDHTUtils.get(dht, Number160.ONE);
-                challenges = (List<Info>) entry.element1().object();
+                challenges = (List<ChallengeInfo>) entry.element1().object();
 
                 logger.debug("Challenges list synchronized");
 

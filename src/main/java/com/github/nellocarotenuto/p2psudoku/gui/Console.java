@@ -5,6 +5,7 @@ import com.github.nellocarotenuto.p2psudoku.sudoku.FilledCellException;
 import com.github.nellocarotenuto.p2psudoku.sudoku.FixedCellException;
 import com.github.nellocarotenuto.p2psudoku.sudoku.InvalidValueException;
 import com.github.nellocarotenuto.p2psudoku.sudoku.Sudoku;
+
 import com.googlecode.lanterna.SGR;
 import com.googlecode.lanterna.Symbols;
 import com.googlecode.lanterna.TerminalPosition;
@@ -316,24 +317,24 @@ public class Console {
                     topLeft.withRelativeRow(5).withRelativeColumn(76),
                     Symbols.DOUBLE_LINE_HORIZONTAL);
 
-            List<Info> challengesList = client.listChallenges();
+            List<ChallengeInfo> challengesList = client.listChallenges();
 
             for (int row = 0; row < 10; row++) {
                 if (row < challengesList.size()) {
-                    Info challenge = challengesList.get(row);
+                    ChallengeInfo challenge = challengesList.get(row);
 
                     textGraphics.putString(topLeft.withRelativeRow(6 + row).withRelativeColumn(1),
                             String.format("%-28s%-28s", challenge.getName(), challenge.getOwner()));
 
-                    if (challenge.getStatus() == Challenge.Status.WAITING) {
+                    if (challenge.getStatus() == ChallengeStatus.WAITING) {
                         textGraphics.setForegroundColor(TextColor.ANSI.YELLOW);
                         textGraphics.putString(topLeft.withRelativeRow(6 + row).withRelativeColumn(1 + 56),
                                 String.format("%10s", properties.getProperty("challenge.status.waiting")));
-                    } else if (challenge.getStatus() == Challenge.Status.PLAYING) {
+                    } else if (challenge.getStatus() == ChallengeStatus.PLAYING) {
                         textGraphics.setForegroundColor(TextColor.ANSI.GREEN);
                         textGraphics.putString(topLeft.withRelativeRow(6 + row).withRelativeColumn(1 + 56),
                                 String.format("%10s", properties.getProperty("challenge.status.playing")));
-                    } else if (challenge.getStatus() == Challenge.Status.ENDED) {
+                    } else if (challenge.getStatus() == ChallengeStatus.ENDED) {
                         textGraphics.setForegroundColor(TextColor.ANSI.BLUE);
                         textGraphics.putString(topLeft.withRelativeRow(6 + row).withRelativeColumn(1 + 56),
                                 String.format("%10s", properties.getProperty("challenge.status.ended")));
@@ -423,7 +424,7 @@ public class Console {
                     } catch (ChallengeAlreadyExistsException e) {
                         messageColor = TextColor.ANSI.RED;
                         message = String.format("%-76s", properties.getProperty("list.messages.name.exists"));
-                    } catch (InvalidNameException e) {
+                    } catch (InvalidChallengeNameException e) {
                         messageColor = TextColor.ANSI.RED;
                         message = String.format("%-76s", properties.getProperty("list.messages.name.invalid"));
                     }
@@ -494,21 +495,21 @@ public class Console {
                     String.format("%s", client.getChallengeName()),
                     SGR.BOLD);
 
-            if (client.getChallengeStatus() == Challenge.Status.WAITING) {
+            if (client.getChallengeStatus() == ChallengeStatus.WAITING) {
                 textGraphics.setForegroundColor(TextColor.ANSI.YELLOW);
 
                 textGraphics.putString(topLeft.withRelativeRow(1).withRelativeColumn(52),
                         String.format("%24s", properties.getProperty("challenge.status.waiting")));
 
                 textGraphics.setForegroundColor(TextColor.ANSI.DEFAULT);
-            } else if (client.getChallengeStatus() == Challenge.Status.PLAYING) {
+            } else if (client.getChallengeStatus() == ChallengeStatus.PLAYING) {
                 textGraphics.setForegroundColor(TextColor.ANSI.GREEN);
 
                 textGraphics.putString(topLeft.withRelativeRow(1).withRelativeColumn(52),
                         String.format("%24s", properties.getProperty("challenge.status.playing")));
 
                 textGraphics.setForegroundColor(TextColor.ANSI.DEFAULT);
-            } else if (client.getChallengeStatus() == Challenge.Status.ENDED) {
+            } else if (client.getChallengeStatus() == ChallengeStatus.ENDED) {
                 textGraphics.setForegroundColor(TextColor.ANSI.BLUE);
 
                 textGraphics.putString(topLeft.withRelativeRow(1).withRelativeColumn(52),
@@ -576,7 +577,7 @@ public class Console {
 
                     String number;
 
-                    if (client.getChallengeStatus() != Challenge.Status.WAITING && matrix[row][column] != 0) {
+                    if (client.getChallengeStatus() != ChallengeStatus.WAITING && matrix[row][column] != 0) {
                         number = matrix[row][column].toString();
                     } else {
                         number = " ";
@@ -701,7 +702,7 @@ public class Console {
                     boardBottomRightEdge.withRelativeRow(-6).withRelativeColumn(34),
                     Symbols.DOUBLE_LINE_HORIZONTAL);
 
-            if (client.getChallengeStatus() == Challenge.Status.WAITING) {
+            if (client.getChallengeStatus() == ChallengeStatus.WAITING) {
                 if (client.isChallengeOwner()) {
                     textGraphics.putString(boardBottomRightEdge.withRelativeRow(-5),
                             String.format("%-35s", properties.getProperty("challenge.tips.4")));
@@ -715,13 +716,13 @@ public class Console {
                     textGraphics.putString(boardBottomRightEdge.withRelativeRow(-4),
                             String.format("%-35s", properties.getProperty("challenge.tips.7")));
                 }
-            } else if (client.getChallengeStatus() == Challenge.Status.PLAYING) {
+            } else if (client.getChallengeStatus() == ChallengeStatus.PLAYING) {
                 textGraphics.putString(boardBottomRightEdge.withRelativeRow(-5),
                         String.format("%-35s", properties.getProperty("challenge.tips.1")));
 
                 textGraphics.putString(boardBottomRightEdge.withRelativeRow(-4),
                         String.format("%-35s", properties.getProperty("challenge.tips.2")));
-            } else if (client.getChallengeStatus() == Challenge.Status.ENDED) {
+            } else if (client.getChallengeStatus() == ChallengeStatus.ENDED) {
                 textGraphics.putString(boardBottomRightEdge.withRelativeRow(-5),
                         String.format("%-35s", properties.getProperty("challenge.tips.8")));
 
@@ -769,7 +770,7 @@ public class Console {
                 String input = command.toString().trim().toLowerCase();
 
                 if (input.equals("!start")) {
-                    if (client.getChallengeStatus() != Challenge.Status.WAITING) {
+                    if (client.getChallengeStatus() != ChallengeStatus.WAITING) {
                         messageColor = TextColor.ANSI.RED;
                         message = String.format("%-35s", properties.getProperty("challenge.messages.started"));
                     } else {
@@ -809,32 +810,27 @@ public class Console {
 
                                 messageColor = TextColor.ANSI.GREEN;
                                 message = String.format("%-35s", properties.getProperty("challenge.messages.correct"));
-                            } catch (CellNotFoundException |
-                                    ChallengeStatusException |
-                                    FilledCellException |
-                                    FixedCellException |
-                                    GuessedNumberException |
-                                    InvalidValueException e) {
+                            } catch (CellNotFoundException e) {
                                 messageColor = TextColor.ANSI.RED;
-
-                                if (e instanceof ChallengeStatusException) {
-                                    if (client.getChallengeStatus() == Challenge.Status.WAITING) {
-                                        message = String.format("%-35s", properties.getProperty("challenge.messages.wait"));
-                                    } else {
-                                        message = String.format("%-35s", properties.getProperty("challenge.messages.ended"));
-                                    }
-                                } else if (e instanceof FilledCellException) {
-                                    message = String.format("%-35s", properties.getProperty("challenge.messages.filled.1"));
-                                } else if (e instanceof FixedCellException) {
-                                    message = String.format("%-35s", properties.getProperty("challenge.messages.fixed"));
-                                } else if (e instanceof InvalidValueException) {
-                                    message = String.format("%-35s", properties.getProperty("challenge.messages.wrong"));
-                                } else if (e instanceof GuessedNumberException) {
-                                    messageColor = TextColor.ANSI.YELLOW;
-                                    message = String.format("%-35s", properties.getProperty("challenge.messages.filled.2"));
+                                message = String.format("%-35s", properties.getProperty("challenge.messages.cellnotfound"));
+                            } catch (ChallengeStatusException e) {
+                                if (client.getChallengeStatus() == ChallengeStatus.WAITING) {
+                                    message = String.format("%-35s", properties.getProperty("challenge.messages.wait"));
                                 } else {
-                                    message = String.format("%-35s", properties.getProperty("challenge.messages.cellnotfound"));
+                                    message = String.format("%-35s", properties.getProperty("challenge.messages.ended"));
                                 }
+                            } catch (FilledCellException e) {
+                                messageColor = TextColor.ANSI.RED;
+                                message = String.format("%-35s", properties.getProperty("challenge.messages.filled.1"));
+                            } catch (FixedCellException e) {
+                                messageColor = TextColor.ANSI.RED;
+                                message = String.format("%-35s", properties.getProperty("challenge.messages.fixed"));
+                            } catch (GuessedNumberException e) {
+                                messageColor = TextColor.ANSI.YELLOW;
+                                message = String.format("%-35s", properties.getProperty("challenge.messages.filled.2"));
+                            } catch (InvalidValueException e) {
+                                messageColor = TextColor.ANSI.RED;
+                                message = String.format("%-35s", properties.getProperty("challenge.messages.wrong"));
                             }
                         }
                     }

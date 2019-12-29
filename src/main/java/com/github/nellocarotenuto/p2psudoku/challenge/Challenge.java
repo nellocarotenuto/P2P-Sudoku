@@ -17,20 +17,19 @@ import org.javatuples.Triplet;
  */
 public class Challenge implements Serializable {
 
-    public enum Status {
-        WAITING, PLAYING, ENDED
-    }
-
     private static final long serialVersionUID = 3711666168632123236L;
 
     public static final int WRONG_NUMBER_SCORE = -1;
     public static final int CORRECT_NUMBER_SCORE = 1;
 
+    public static final String GAME_NAME_FORMAT = "^([a-zA-Z0-9]+( [a-zA-Z0-9]+)*){3,24}$";
+    public static final String NICKNAME_FORMAT = "^[a-zA-Z0-9._-]{3,24}$";
+
     private String name;
     private Sudoku sudoku;
     private Integer[][] initialBoard;
     private Player owner;
-    private Status status;
+    private ChallengeStatus status;
     private boolean listed;
     private HashMap<Player, Triplet<Integer[][], Integer, Boolean>> games;
 
@@ -43,6 +42,11 @@ public class Challenge implements Serializable {
      * @param listed true if the challenge is to be public, false otherwise
      */
     public Challenge(Player owner, String name, int seed, boolean listed) {
+        if (!name.matches(GAME_NAME_FORMAT)) {
+            throw new InvalidChallengeNameException("A game name must be at least 3 characters long and only contain " +
+                    "letters, numbers, dashes, dots and underscores.");
+        }
+
         // Set the game name
         this.name = name;
 
@@ -62,7 +66,7 @@ public class Challenge implements Serializable {
         this.owner = owner;
 
         // Set the status to waiting
-        this.status = Status.WAITING;
+        this.status = ChallengeStatus.WAITING;
     }
 
     /**
@@ -122,17 +126,28 @@ public class Challenge implements Serializable {
      *         Status.PLAYING if the challenge has started but not completed
      *         Status.ENDED if the challenge is completed
      */
-    public Status getStatus() {
+    public ChallengeStatus getStatus() {
         return status;
     }
 
     /**
-     * Sets the status of the challenge.
+     * Sets the status of the challenge to playing.
      *
-     * @param status the new status of the challenge
+     * @param player the player requesting to start the challenge
+     *
+     * @throws ChallengeStatusException if the challenge has already started or ended
+     * @throws UnauthorizedOperationException if the player requesting the action isn't the owner of the challenge
      */
-    public void setStatus(Status status) {
-        this.status = status;
+    public void start(Player player) throws ChallengeStatusException, UnauthorizedOperationException {
+        if (!player.equals(owner)) {
+            throw new UnauthorizedOperationException("The challenge can only be started by the owner.");
+        }
+
+        if (status != ChallengeStatus.WAITING) {
+            throw new ChallengeStatusException("Unable to start a challenge if it has already been started earlier.");
+        }
+
+        this.status = ChallengeStatus.PLAYING;
     }
 
     /**
@@ -172,19 +187,44 @@ public class Challenge implements Serializable {
      * @param column the column index (starting at 0) of the cell where to insert the number
      * @param number the solution number
      *
+     * @throws CellNotFoundException if the cell selected is outside the board
+     * @throws ChallengeStatusException if the challenge has not started yet or  has already finished
+     * @throws FilledCellException if the cell selected has already been filled by the player
      * @throws FixedCellException if the cell selected is fixed
+     * @throws GuessedNumberException if the cell selected has already been filled by another player
      * @throws InvalidValueException if the number doesn't fit into the specified cell
      */
-    public void placeNumber(Player player, int row, int column, int number) throws FixedCellException,
+    public void placeNumber(Player player, int row, int column, int number) throws CellNotFoundException,
+                                                                                   ChallengeStatusException,
+                                                                                   FilledCellException,
+                                                                                   FixedCellException,
+                                                                                   GuessedNumberException,
                                                                                    InvalidValueException {
+        if (status != ChallengeStatus.PLAYING) {
+            throw new ChallengeStatusException("Unable to place a number if the challenge has ended or not yet " +
+                    "started.");
+        }
+
         Triplet<Integer[][], Integer, Boolean> game = games.get(player);
 
         Integer[][] board = game.getValue0();
         int score = game.getValue1();
         boolean completed = game.getValue2();
 
+        if (row < 0 || row >= Sudoku.SIDE_SIZE || column < 0 || column >= Sudoku.SIDE_SIZE) {
+            throw new CellNotFoundException("Cell (" + row + ", " + column + ") doesn't belong to the board.");
+        }
+
         if (completed) {
             return;
+        }
+
+        if (initialBoard[row][column] != Sudoku.EMPTY_VALUE) {
+            throw new FixedCellException("Unable to place " + number + " at cell " + row + ", " + column +
+                    ": the cell is fixed.");
+        } else if (board[row][column] != Sudoku.EMPTY_VALUE) {
+            throw new FilledCellException("Unable to place " + number + " at cell " + row + ", " + column +
+                    ": the cell has already a value.");
         }
 
         try {
@@ -203,7 +243,8 @@ public class Challenge implements Serializable {
             board[row][column] = number;
             game = game.setAt0(board);
 
-            throw e;
+            throw new GuessedNumberException("Number at cell " + row + ", " + column +
+                    " has already been guessed by another player.");
         } catch (InvalidValueException e) {
             // Decrement user score
             score += WRONG_NUMBER_SCORE;
@@ -234,7 +275,7 @@ public class Challenge implements Serializable {
 
             // Set the status of the whole challenge to ended if one player has completed the board
             if (completed) {
-                this.status = Status.ENDED;
+                this.status = ChallengeStatus.ENDED;
             }
         }
     }
@@ -244,8 +285,8 @@ public class Challenge implements Serializable {
      *
      * @return the public details of the challenge
      */
-    public Info getInfo() {
-        return new Info(name, owner.getNickname(), status, games.keySet().size());
+    public ChallengeInfo getInfo() {
+        return new ChallengeInfo(this);
     }
 
     @Override

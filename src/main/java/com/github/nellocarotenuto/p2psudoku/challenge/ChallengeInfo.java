@@ -6,27 +6,25 @@ import java.util.Objects;
 /**
  * Models a simpler object to represent public info of a challenge.
  */
-public class Info implements Serializable {
+public class ChallengeInfo implements Serializable {
 
     private static final long serialVersionUID = 8175570788346488662L;
 
     private String name;
     private String owner;
-    private Challenge.Status status;
+    private ChallengeStatus status;
     private int players;
 
     /**
      * Creates a new object representing the info of a challenge.
      *
-     * @param name the name of the challenge
-     * @param owner the name of the owner of the challenge
-     * @param status the status of the challenge
+     * @param challenge the challenge to represent
      */
-    public Info(String name, String owner, Challenge.Status status, int players) {
-        this.name = name;
-        this.owner = owner;
-        this.status = status;
-        this.players = players;
+    public ChallengeInfo(Challenge challenge) {
+        name = challenge.getName();
+        owner = challenge.getOwner().getNickname();
+        status = challenge.getStatus();
+        players = challenge.getGames().keySet().size();
     }
 
     public String getName() {
@@ -41,11 +39,11 @@ public class Info implements Serializable {
         this.owner = owner;
     }
 
-    public Challenge.Status getStatus() {
+    public ChallengeStatus getStatus() {
         return status;
     }
 
-    public void setStatus(Challenge.Status status) {
+    public void setStatus(ChallengeStatus status) {
         this.status = status;
     }
 
@@ -67,7 +65,7 @@ public class Info implements Serializable {
             return false;
         }
 
-        Info info = (Info) object;
+        ChallengeInfo info = (ChallengeInfo) object;
         return name.equals(info.name);
     }
 
@@ -78,7 +76,7 @@ public class Info implements Serializable {
 
     @Override
     public String toString() {
-        return "Info{" +
+        return "ChallengeInfo{" +
                 "\n\tname='" + name + "'," +
                 "\n\towner='" + owner + "'," +
                 "\n\tstatus='" + status + "'," +
