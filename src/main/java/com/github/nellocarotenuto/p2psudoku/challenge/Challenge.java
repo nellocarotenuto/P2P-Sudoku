@@ -2,7 +2,7 @@ package com.github.nellocarotenuto.p2psudoku.challenge;
 
 import com.github.nellocarotenuto.p2psudoku.sudoku.FixedCellException;
 import com.github.nellocarotenuto.p2psudoku.sudoku.FilledCellException;
-import com.github.nellocarotenuto.p2psudoku.sudoku.InvalidValueException;
+import com.github.nellocarotenuto.p2psudoku.sudoku.InvalidNumberException;
 import com.github.nellocarotenuto.p2psudoku.sudoku.Sudoku;
 
 import java.io.Serializable;
@@ -101,7 +101,7 @@ public class Challenge implements Serializable {
      *
      * @param player the player to add
      */
-    public void addPlayer(Player player) throws JoinException {
+    public void addPlayer(Player player) throws ChallengeNotFoundException {
         if (games.containsKey(player)) {
             return;
         }
@@ -191,15 +191,15 @@ public class Challenge implements Serializable {
      * @throws ChallengeStatusException if the challenge has not started yet or  has already finished
      * @throws FilledCellException if the cell selected has already been filled by the player
      * @throws FixedCellException if the cell selected is fixed
-     * @throws GuessedNumberException if the cell selected has already been filled by another player
-     * @throws InvalidValueException if the number doesn't fit into the specified cell
+     * @throws NumberAlreadyGuessedException if the cell selected has already been filled by another player
+     * @throws InvalidNumberException if the number doesn't fit into the specified cell
      */
     public void placeNumber(Player player, int row, int column, int number) throws CellNotFoundException,
                                                                                    ChallengeStatusException,
                                                                                    FilledCellException,
                                                                                    FixedCellException,
-                                                                                   GuessedNumberException,
-                                                                                   InvalidValueException {
+            NumberAlreadyGuessedException,
+            InvalidNumberException {
         if (status != ChallengeStatus.PLAYING) {
             throw new ChallengeStatusException("Unable to place a number if the challenge has ended or not yet " +
                     "started.");
@@ -243,9 +243,9 @@ public class Challenge implements Serializable {
             board[row][column] = number;
             game = game.setAt0(board);
 
-            throw new GuessedNumberException("Number at cell " + row + ", " + column +
+            throw new NumberAlreadyGuessedException("Number at cell " + row + ", " + column +
                     " has already been guessed by another player.");
-        } catch (InvalidValueException e) {
+        } catch (InvalidNumberException e) {
             // Decrement user score
             score += WRONG_NUMBER_SCORE;
             game = game.setAt1(score);

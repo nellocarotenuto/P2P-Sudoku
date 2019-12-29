@@ -106,7 +106,7 @@ public class Sudoku implements Serializable {
                         cell.setValue(candidate.getValue0());
                         cellIndex++;
                         break;
-                    } catch (InvalidValueException e) {
+                    } catch (InvalidNumberException e) {
                         continue;
                     }
                 }
@@ -193,9 +193,9 @@ public class Sudoku implements Serializable {
      * @param number the number to put into the cell
      *
      * @throws FilledCellException if the cell is already filled
-     * @throws InvalidValueException if the value doesn't fit into the cell
+     * @throws InvalidNumberException if the value doesn't fit into the cell
      */
-    public void placeNumber(int row, int column, int number) throws FilledCellException, InvalidValueException {
+    public void placeNumber(int row, int column, int number) throws FilledCellException, InvalidNumberException {
         if (row < 0 || row >= SIDE_SIZE || column < 0 || column >= SIDE_SIZE) {
             throw new RuntimeException("This cell doesn't exist");
         }
@@ -208,7 +208,7 @@ public class Sudoku implements Serializable {
         }
 
         if (number != cell.getCorrectValue()) {
-            throw new InvalidValueException("Unable to place " + number + " at cell " + row + ", " + column +
+            throw new InvalidNumberException("Unable to place " + number + " at cell " + row + ", " + column +
                                             ": constraints violated.");
         }
 

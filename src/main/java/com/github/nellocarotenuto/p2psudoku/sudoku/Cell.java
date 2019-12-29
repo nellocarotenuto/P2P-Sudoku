@@ -39,15 +39,15 @@ class Cell implements Serializable {
      *
      * @param value the value to set for the cell
      *
-     * @throws InvalidValueException if the value is not correct
+     * @throws InvalidNumberException if the value is not correct
      */
-    void setValue(int value) throws InvalidValueException {
+    void setValue(int value) throws InvalidNumberException {
         this.value = value;
 
         for (Group group : groups) {
             if (!group.isValid()) {
                 this.value = Sudoku.EMPTY_VALUE;
-                throw new InvalidValueException("Group contains duplicates, constraints violated.");
+                throw new InvalidNumberException("Group contains duplicates, constraints violated.");
             }
         }
     }

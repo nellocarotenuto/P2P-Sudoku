@@ -2,7 +2,7 @@ package com.github.nellocarotenuto.p2psudoku.challenge;
 
 import com.github.nellocarotenuto.p2psudoku.sudoku.FilledCellException;
 import com.github.nellocarotenuto.p2psudoku.sudoku.FixedCellException;
-import com.github.nellocarotenuto.p2psudoku.sudoku.InvalidValueException;
+import com.github.nellocarotenuto.p2psudoku.sudoku.InvalidNumberException;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,15 +14,15 @@ import java.net.InetAddress;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class ChallengeTests {
+public class GameClientTests {
 
-    private Client client1;
-    private Client client2;
+    private GameClient client1;
+    private GameClient client2;
 
     @BeforeEach
     public void createClients() throws Exception {
-        client1 = new Client(InetAddress.getByName("127.0.0.1"), 4001, 4001);
-        client2 = new Client(InetAddress.getByName("127.0.0.1"), 4001, 4002);
+        client1 = new GameClientImpl(InetAddress.getByName("127.0.0.1"), 4001, 4001);
+        client2 = new GameClientImpl(InetAddress.getByName("127.0.0.1"), 4001, 4002);
     }
 
     @AfterEach
@@ -205,7 +205,7 @@ public class ChallengeTests {
     public void testJoinNotExistingChallenge() throws Exception {
         client1.login("Alice");
 
-        assertThrows(JoinException.class, () -> {
+        assertThrows(ChallengeNotFoundException.class, () -> {
             client1.joinChallenge("Challenge 1");
         });
     }
@@ -238,7 +238,7 @@ public class ChallengeTests {
         client1.createChallenge("Challenge 1", 7, false);
         client1.quitChallenge();
 
-        assertThrows(JoinException.class, () -> {
+        assertThrows(ChallengeNotFoundException.class, () -> {
             client2.joinChallenge("Challenge 1");
         });
     }
@@ -333,7 +333,7 @@ public class ChallengeTests {
 
         client1.placeNumber(7, 6, 4);
 
-        assertThrows(GuessedNumberException.class, () -> {
+        assertThrows(NumberAlreadyGuessedException.class, () -> {
             client2.placeNumber(7, 6, 4);
         });
 
@@ -389,13 +389,11 @@ public class ChallengeTests {
 
         client1.startChallenge();
 
-        assertThrows(InvalidValueException.class, () -> {
+        assertThrows(InvalidNumberException.class, () -> {
             client1.placeNumber(7, 6, 7);
         });
 
         assertEquals(client1.getChallengeScore(), Challenge.WRONG_NUMBER_SCORE);
     }
-
-
 
 }

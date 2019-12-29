@@ -27,14 +27,14 @@ import org.slf4j.LoggerFactory;
 /**
  * Exposes game's public API and implements its logic.
  */
-public class Client {
+public class GameClientImpl implements GameClient {
 
     private enum Notification {
         CHALLENGES_LIST_UPDATED,
         CHALLENGE_UPDATED
     }
 
-    private static final Logger logger = LoggerFactory.getLogger(Client.class);
+    private static final Logger logger = LoggerFactory.getLogger(GameClientImpl.class);
 
     private static final int MAX_SYNC_ATTEMPTS = 10;
 
@@ -49,7 +49,7 @@ public class Client {
     private List<ChallengeInfo> challenges;
     private Challenge challenge;
 
-    public Client(InetAddress masterAddress, int masterPort, int localPort) throws Exception {
+    public GameClientImpl(InetAddress masterAddress, int masterPort, int localPort) throws Exception {
         // Define the random number generator
         random = new Random();
 
@@ -116,6 +116,7 @@ public class Client {
      * @throws InvalidNicknameException if the nickname passed as parameter doesn't match the predefined pattern
      * @throws TakenNicknameException if the nickname picked has already been chosen by another user
      */
+    @Override
     @SuppressWarnings("unchecked")
     public void login(String nickname) throws Exception {
         if (player != null) {
@@ -164,6 +165,7 @@ public class Client {
     /**
      * Allows a currently logged in user to log out of the system.
      */
+    @Override
     @SuppressWarnings("unchecked")
     public void logout() throws Exception {
         if (player == null) {
@@ -204,6 +206,7 @@ public class Client {
      *
      * @return the current list of logged in players
      */
+    @Override
     @SuppressWarnings("unchecked")
     public List<Player> listPlayers() throws Exception {
         for (int attempt = 0; attempt < MAX_SYNC_ATTEMPTS; attempt++) {
@@ -224,6 +227,7 @@ public class Client {
      *
      * @return the nickname of the player currently logged in
      */
+    @Override
     public String getNickname() {
         if (player == null) {
             throw new RuntimeException("Player not logged in.");
@@ -242,6 +246,7 @@ public class Client {
      * @throws ChallengeAlreadyExistsException if a challenge with the same name already exists
      * @throws InvalidChallengeNameException if the name chosen doesn't match the pattern
      */
+    @Override
     public void createChallenge(String name, int seed, boolean listed) throws Exception {
         if (player == null) {
             throw new RuntimeException("Unable to create a new challenge if not logged in.");
@@ -288,6 +293,7 @@ public class Client {
      *
      * @return the list of public challenges available in the system
      */
+    @Override
     public List<ChallengeInfo> listChallenges() {
         return challenges;
     }
@@ -297,8 +303,9 @@ public class Client {
      *
      * @param name the name of the challenge to join
      *
-     * @throws JoinException if no game with the specified name exists
+     * @throws ChallengeNotFoundException if no challenge with the specified name exists
      */
+    @Override
     public void joinChallenge(String name) throws Exception {
         if (player == null) {
             throw new RuntimeException("Unable to join a challenge if not logged in.");
@@ -330,7 +337,7 @@ public class Client {
                 notifyUpdate(Notification.CHALLENGE_UPDATED);
                 break;
             } catch (ElementNotFoundException e) {
-                throw new JoinException("Challenge " + name + " doesn't exist.");
+                throw new ChallengeNotFoundException("Challenge " + name + " doesn't exist.");
             } catch (FailedOperationException e) {
                 logger.debug("Join attempt " + (attempt + 1) + " failed");
 
@@ -353,6 +360,7 @@ public class Client {
      * The challenge is deleted if there was only one player participating.
      * The ownership is handed over to another player participating to the challenge if the owner quits.
      */
+    @Override
     public void quitChallenge() throws Exception {
         if (challenge == null) {
             return;
@@ -416,6 +424,7 @@ public class Client {
      *
      * @throws UnauthorizedOperationException if the player is not the owner of the challenge
      */
+    @Override
     public void startChallenge() throws Exception {
         if (player == null) {
             throw new RuntimeException("Unable to start a challenge if not logged in.");
@@ -460,7 +469,7 @@ public class Client {
     }
 
     /**
-     * Lets the user place a number in the board.
+     * Lets the user place a number in the board and updates his score accordingly.
      *
      * @param row the row index (starting at 0) of the cell where to insert the number
      * @param column the column index (starting at 0) of the cell where to insert the number
@@ -468,6 +477,7 @@ public class Client {
      *
      * @throws ChallengeStatusException if the challenge has not started or already ended
      */
+    @Override
     public void placeNumber(int row, int column, int number) throws Exception {
         if (challenge == null) {
             throw new RuntimeException("Unable to place a number if not participating to a challenge.");
@@ -510,6 +520,7 @@ public class Client {
      *
      * @return the name of the current challenge
      */
+    @Override
     public String getChallengeName() {
         if (challenge == null) {
             throw new RuntimeException("Unable to get the name of the current challenge while not participating to any.");
@@ -523,6 +534,7 @@ public class Client {
      *
      * @return the integer matrix representing user's board for the current matrix
      */
+    @Override
     public Integer[][] getChallengeBoard() {
         if (challenge == null) {
             throw new RuntimeException("Unable to get the current board while not participating to any challenge.");
@@ -536,6 +548,7 @@ public class Client {
      *
      * @return the integer score of the user for the current challenge
      */
+    @Override
     public int getChallengeScore() {
         if (challenge == null) {
             throw new RuntimeException("Unable to get the current score while not participating to any challenge.");
@@ -549,6 +562,7 @@ public class Client {
      *
      * @return the list of players participating to the challenge sorted by their scores
      */
+    @Override
     public List<Pair<String, Integer>> getChallengeScores() {
         if (challenge == null) {
             throw new RuntimeException("Unable to get other players' scores while not participating to any challenge.");
@@ -577,6 +591,7 @@ public class Client {
      *
      * @return true if the player logged in is the owner of the current challenge, false otherwise
      */
+    @Override
     public boolean isChallengeOwner() {
         if (player == null || challenge == null) {
             throw new RuntimeException("The player has to be logged in and participating to a challenge");
@@ -590,6 +605,7 @@ public class Client {
      *
      * @return the nickname of the owner of the current challenge
      */
+    @Override
     public String getChallengeOwnerNickname() {
         if (challenge == null) {
             throw new RuntimeException("Unable to get owner's nickname if not participating to any challenge.");
@@ -603,6 +619,7 @@ public class Client {
      *
      * @return the status of the current challenge
      */
+    @Override
     public ChallengeStatus getChallengeStatus() {
         if (challenge == null) {
             throw new RuntimeException("Unable to get the game status if not participating to any challenge.");
@@ -614,6 +631,7 @@ public class Client {
     /**
      * Properly leaves the network by logging out and announcing the shutdown the others.
      */
+    @Override
     public void close() throws Exception {
         if (player != null) {
             logout();

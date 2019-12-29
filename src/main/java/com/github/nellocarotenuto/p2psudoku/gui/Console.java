@@ -3,7 +3,7 @@ package com.github.nellocarotenuto.p2psudoku.gui;
 import com.github.nellocarotenuto.p2psudoku.challenge.*;
 import com.github.nellocarotenuto.p2psudoku.sudoku.FilledCellException;
 import com.github.nellocarotenuto.p2psudoku.sudoku.FixedCellException;
-import com.github.nellocarotenuto.p2psudoku.sudoku.InvalidValueException;
+import com.github.nellocarotenuto.p2psudoku.sudoku.InvalidNumberException;
 import com.github.nellocarotenuto.p2psudoku.sudoku.Sudoku;
 
 import com.googlecode.lanterna.SGR;
@@ -41,16 +41,16 @@ public class Console {
 
     private Properties properties;
 
-    private Client client;
+    private GameClient client;
 
     @Option(name="-ma", aliases="--master-address", usage="The address of the master peer")
     private String masterPeerAddress = "127.0.0.1";
 
     @Option(name="-mp", aliases="--master-port", usage="The port of the master peer")
-    private int masterPeerPort = Client.DEFAULT_PORT;
+    private int masterPeerPort = GameClientImpl.DEFAULT_PORT;
 
     @Option(name="-lp", aliases="--local-port", usage="The local port to use to connect")
-    private int localPort = Client.DEFAULT_PORT;
+    private int localPort = GameClientImpl.DEFAULT_PORT;
 
     public static void main(String[] args) {
         Console console = null;
@@ -87,7 +87,7 @@ public class Console {
         }
 
         // Create a client and show login
-        client = new Client(InetAddress.getByName(masterPeerAddress), masterPeerPort, localPort);
+        client = new GameClientImpl(InetAddress.getByName(masterPeerAddress), masterPeerPort, localPort);
 
         // Load project resources
         try (InputStream input = ClassLoader.getSystemResourceAsStream("strings.properties")) {
@@ -401,7 +401,7 @@ public class Console {
                         client.joinChallenge(input);
                         showChallenge();
                         screen.clear();
-                    } catch (JoinException e) {
+                    } catch (ChallengeNotFoundException e) {
                         messageColor = TextColor.ANSI.RED;
                         message = String.format("%-76s", properties.getProperty("list.messages.notfound"));
                     }
@@ -825,10 +825,10 @@ public class Console {
                             } catch (FixedCellException e) {
                                 messageColor = TextColor.ANSI.RED;
                                 message = String.format("%-35s", properties.getProperty("challenge.messages.fixed"));
-                            } catch (GuessedNumberException e) {
+                            } catch (NumberAlreadyGuessedException e) {
                                 messageColor = TextColor.ANSI.YELLOW;
                                 message = String.format("%-35s", properties.getProperty("challenge.messages.filled.2"));
-                            } catch (InvalidValueException e) {
+                            } catch (InvalidNumberException e) {
                                 messageColor = TextColor.ANSI.RED;
                                 message = String.format("%-35s", properties.getProperty("challenge.messages.wrong"));
                             }
