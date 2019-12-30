@@ -124,7 +124,7 @@ local port to use. By default the first parameter is set to ```localhost```, whi
 at least one parameter between ```-mp``` (if running on a different host) and ```-lp``` (if running on the same host).
 
 For Docker, the application can be run with ```docker run -i -t --name PEER-X p2p-sudoku``` paying attention to specify
-the name of the container as well as to append application's arguments at the end, after container's name.
+the name of the container as well as to append application's arguments at the end, after the name of the image.
 
 ## Usage
 <p align="center">
