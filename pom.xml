@@ -16,7 +16,7 @@
         own challenge and wait for other players to join in order to compete with them. Every player participating at a
         challenge has the same board at the beginning, but only the numbers he/she places are shown as the game goes on.
 
-        Every time a player places a number in a challenge, his/her score is updated is updated within that challenge
+        Every time a player places a number in a challenge, his/her score is updated within that particular challenge
         with the following rules: the player earns 1 point if he's the first one in that challenge to have placed that
         particular number, 0 points if the number is correct but another player found it earlier and -1 points if the
         number isn't correct.  No one can see the common board of a challenge but every player is informed as others'
