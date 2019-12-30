@@ -10,7 +10,7 @@ import net.tomp2p.peers.Number160;
 import net.tomp2p.peers.Number640;
 import net.tomp2p.peers.PeerAddress;
 import net.tomp2p.storage.Data;
-import net.tomp2p.utils.Pair;
+import org.javatuples.Pair;
 
 /**
  * An helper class that exposes common DHT operations but handling concurrency.
@@ -96,8 +96,8 @@ public class PeerDHTUtils {
      * @throws FailedOperationException if something goes wrong when performing the operation on the DHT
      */
     public static void update(PeerDHT dht, Pair<Number640, Data> pair) throws Exception {
-        Number640 key = pair.element0();
-        Data data = pair.element1();
+        Number640 key = pair.getValue0();
+        Data data = pair.getValue1();
 
         data.addBasedOn(key.versionKey());
 
@@ -113,9 +113,9 @@ public class PeerDHTUtils {
         try {
             Pair<Number640, Byte> latest = checkLatestVersion(put1.rawResult());
 
-            if (latest.element1() == 1) {
-                FuturePut put2 = dht.put(latest.element0().locationKey())
-                                    .versionKey(latest.element0().versionKey())
+            if (latest.getValue1() == 1) {
+                FuturePut put2 = dht.put(latest.getValue0().locationKey())
+                                    .versionKey(latest.getValue0().versionKey())
                                     .putConfirm()
                                     .data(new Data())
                                     .start();

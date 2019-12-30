@@ -1,6 +1,6 @@
 package com.github.nellocarotenuto.p2psudoku.challenge;
 
-import net.tomp2p.utils.Pair;
+import org.javatuples.Pair;
 
 import java.util.List;
 

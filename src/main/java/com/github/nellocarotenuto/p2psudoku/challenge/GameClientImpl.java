@@ -18,9 +18,10 @@ import net.tomp2p.peers.Number640;
 import net.tomp2p.peers.PeerAddress;
 import net.tomp2p.rpc.ObjectDataReply;
 import net.tomp2p.storage.Data;
-import net.tomp2p.utils.Pair;
 
 import org.javatuples.Triplet;
+import org.javatuples.Pair;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -133,8 +134,8 @@ public class GameClientImpl implements GameClient {
         for (int attempt = 0; attempt < MAX_SYNC_ATTEMPTS; attempt++) {
             try {
                 Pair<Number640, Data> entry = PeerDHTUtils.get(dht, Number160.ZERO);
-                Number640 key = entry.element0();
-                List<Player> players = (List<Player>) entry.element1().object();
+                Number640 key = entry.getValue0();
+                List<Player> players = (List<Player>) entry.getValue1().object();
 
                 if (players.contains(player)) {
                     throw new TakenNicknameException("Nickname \"" + nickname + "\" has already been taken.");
@@ -179,11 +180,11 @@ public class GameClientImpl implements GameClient {
         for (int attempt = 0; attempt < MAX_SYNC_ATTEMPTS; attempt++) {
             try {
                 Pair<Number640, Data> entry = PeerDHTUtils.get(dht, Number160.ZERO);
-                List<Player> players = (List<Player>) entry.element1().object();
+                List<Player> players = (List<Player>) entry.getValue1().object();
 
                 players.remove(player);
 
-                PeerDHTUtils.update(dht, new Pair<>(entry.element0(), new Data(players)));
+                PeerDHTUtils.update(dht, new Pair<>(entry.getValue0(), new Data(players)));
 
                 logger.debug("Player " + player.getNickname() + " logged out");
 
@@ -211,7 +212,7 @@ public class GameClientImpl implements GameClient {
     public List<Player> listPlayers() throws Exception {
         for (int attempt = 0; attempt < MAX_SYNC_ATTEMPTS; attempt++) {
             try {
-                return (List<Player>) PeerDHTUtils.get(dht, Number160.ZERO).element1().object();
+                return (List<Player>) PeerDHTUtils.get(dht, Number160.ZERO).getValue1().object();
             } catch (FailedOperationException e) {
                 logger.debug("Listing players attemp " + (attempt + 1) + " failed");
 
@@ -324,8 +325,8 @@ public class GameClientImpl implements GameClient {
         for (int attempt = 0; attempt < MAX_SYNC_ATTEMPTS; attempt++) {
             try {
                 Pair<Number640, Data> entry = PeerDHTUtils.get(dht, Number160.createHash(name));
-                Number640 key = entry.element0();
-                challenge = (Challenge) entry.element1().object();
+                Number640 key = entry.getValue0();
+                challenge = (Challenge) entry.getValue1().object();
 
                 challenge.addPlayer(player);
 
@@ -373,9 +374,9 @@ public class GameClientImpl implements GameClient {
         for (int attempt = 0; attempt < MAX_SYNC_ATTEMPTS; attempt++) {
             try {
                 Pair<Number640, Data> entry = PeerDHTUtils.get(dht, Number160.createHash(this.challenge.getName()));
-                Number640 key = entry.element0();
+                Number640 key = entry.getValue0();
 
-                challenge = (Challenge) entry.element1().object();
+                challenge = (Challenge) entry.getValue1().object();
                 challenge.removePlayer(player);
 
                 if (challenge.getGames().size() == 0) {
@@ -439,8 +440,8 @@ public class GameClientImpl implements GameClient {
         for (int attempt = 0; attempt < MAX_SYNC_ATTEMPTS; attempt++) {
             try {
                 Pair<Number640, Data> entry = PeerDHTUtils.get(dht, Number160.createHash(this.challenge.getName()));
-                Number640 key = entry.element0();
-                challenge = (Challenge) entry.element1().object();
+                Number640 key = entry.getValue0();
+                challenge = (Challenge) entry.getValue1().object();
 
                 challenge.start(player);
 
@@ -486,8 +487,8 @@ public class GameClientImpl implements GameClient {
         for (int attempt = 0; attempt < MAX_SYNC_ATTEMPTS; attempt++) {
             try {
                 Pair<Number640, Data> entry = PeerDHTUtils.get(dht, Number160.createHash(this.challenge.getName()));
-                Number640 key = entry.element0();
-                Challenge challenge = (Challenge) entry.element1().object();
+                Number640 key = entry.getValue0();
+                Challenge challenge = (Challenge) entry.getValue1().object();
 
                 try {
                     challenge.placeNumber(player, row, column, number);
@@ -579,7 +580,7 @@ public class GameClientImpl implements GameClient {
         scores.sort(new Comparator<Pair<String, Integer>>() {
             @Override
             public int compare(Pair<String, Integer> pair1, Pair<String, Integer> pair2) {
-                return pair2.element1().compareTo(pair1.element1());
+                return pair2.getValue1().compareTo(pair1.getValue1());
             }
         });
 
@@ -650,8 +651,8 @@ public class GameClientImpl implements GameClient {
         for (int attempt = 0; attempt < MAX_SYNC_ATTEMPTS; attempt++) {
             try {
                 Pair<Number640, Data> entry = PeerDHTUtils.get(dht, Number160.ONE);
-                Number640 key = entry.element0();
-                List<ChallengeInfo> challenges = (List<ChallengeInfo>) entry.element1().object();
+                Number640 key = entry.getValue0();
+                List<ChallengeInfo> challenges = (List<ChallengeInfo>) entry.getValue1().object();
 
                 challenges.add(challenge.getInfo());
 
@@ -685,8 +686,8 @@ public class GameClientImpl implements GameClient {
         for (int attempt = 0; attempt < MAX_SYNC_ATTEMPTS; attempt++) {
             try {
                 Pair<Number640, Data> entry = PeerDHTUtils.get(dht, Number160.ONE);
-                Number640 key = entry.element0();
-                List<ChallengeInfo> challenges = (List<ChallengeInfo>) entry.element1().object();
+                Number640 key = entry.getValue0();
+                List<ChallengeInfo> challenges = (List<ChallengeInfo>) entry.getValue1().object();
 
                 int index = challenges.indexOf(challenge.getInfo());
                 challenges.set(index, challenge.getInfo());
@@ -721,8 +722,8 @@ public class GameClientImpl implements GameClient {
         for (int attempt = 0; attempt < MAX_SYNC_ATTEMPTS; attempt++) {
             try {
                 Pair<Number640, Data> entry = PeerDHTUtils.get(dht, Number160.ONE);
-                Number640 key = entry.element0();
-                List<ChallengeInfo> challenges = (List<ChallengeInfo>) entry.element1().object();
+                Number640 key = entry.getValue0();
+                List<ChallengeInfo> challenges = (List<ChallengeInfo>) entry.getValue1().object();
 
                 challenges.remove(challenge.getInfo());
 
@@ -790,7 +791,7 @@ public class GameClientImpl implements GameClient {
         for (int attempt = 0; attempt < MAX_SYNC_ATTEMPTS; attempt++) {
             try {
                 Pair<Number640, Data> entry = PeerDHTUtils.get(dht, Number160.createHash(challenge.getName()));
-                challenge = (Challenge) entry.element1().object();
+                challenge = (Challenge) entry.getValue1().object();
 
                 logger.debug("Challenge synchronized");
 
@@ -815,7 +816,7 @@ public class GameClientImpl implements GameClient {
         for (int attempt = 0; attempt < MAX_SYNC_ATTEMPTS; attempt++) {
             try {
                 Pair<Number640, Data> entry = PeerDHTUtils.get(dht, Number160.ONE);
-                challenges = (List<ChallengeInfo>) entry.element1().object();
+                challenges = (List<ChallengeInfo>) entry.getValue1().object();
 
                 logger.debug("Challenges list synchronized");
 

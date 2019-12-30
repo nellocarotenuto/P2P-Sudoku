@@ -15,7 +15,7 @@ import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.Terminal;
 
-import net.tomp2p.utils.Pair;
+import org.javatuples.Pair;
 
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
@@ -677,13 +677,13 @@ public class Console {
                 if (player < scores.size()) {
                     Pair<String, Integer> score = scores.get(player);
 
-                    if (score.element0().equals(client.getNickname())) {
+                    if (score.getValue0().equals(client.getNickname())) {
                         textGraphics.putString(boardTopRightEdge.withRelativeRow(2 + player),
-                                String.format("%-30s%5s", score.element0(), score.element1()),
+                                String.format("%-30s%5s", score.getValue0(), score.getValue1()),
                                 SGR.BOLD);
                     } else {
                         textGraphics.putString(boardTopRightEdge.withRelativeRow(2 + player),
-                                String.format("%-30s%5s", score.element0(), score.element1()));
+                                String.format("%-30s%5s", score.getValue0(), score.getValue1()));
                     }
                 } else {
                     textGraphics.putString(boardTopRightEdge.withRelativeRow(2 + player),
