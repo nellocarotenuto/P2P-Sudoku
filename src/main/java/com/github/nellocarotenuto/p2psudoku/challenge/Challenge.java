@@ -1,9 +1,6 @@
 package com.github.nellocarotenuto.p2psudoku.challenge;
 
-import com.github.nellocarotenuto.p2psudoku.sudoku.FixedCellException;
-import com.github.nellocarotenuto.p2psudoku.sudoku.FilledCellException;
-import com.github.nellocarotenuto.p2psudoku.sudoku.InvalidNumberException;
-import com.github.nellocarotenuto.p2psudoku.sudoku.Sudoku;
+import com.github.nellocarotenuto.p2psudoku.sudoku.*;
 
 import java.io.Serializable;
 import java.util.Arrays;
@@ -215,20 +212,8 @@ public class Challenge implements Serializable {
         int score = game.getValue1();
         boolean completed = game.getValue2();
 
-        if (row < 0 || row >= Sudoku.SIDE_SIZE || column < 0 || column >= Sudoku.SIDE_SIZE) {
-            throw new CellNotFoundException("Cell (" + row + ", " + column + ") doesn't belong to the board.");
-        }
-
         if (completed) {
             return;
-        }
-
-        if (initialBoard[row][column] != Sudoku.EMPTY_VALUE) {
-            throw new FixedCellException("Unable to place " + number + " at cell " + row + ", " + column +
-                    ": the cell is fixed.");
-        } else if (board[row][column] != Sudoku.EMPTY_VALUE) {
-            throw new FilledCellException("Unable to place " + number + " at cell " + row + ", " + column +
-                    ": the cell has already a value.");
         }
 
         try {
@@ -243,12 +228,17 @@ public class Challenge implements Serializable {
             score += CORRECT_NUMBER_SCORE;
             game = game.setAt1(score);
         } catch (FilledCellException e) {
-            // Just set the number into user's board
-            board[row][column] = number;
-            game = game.setAt0(board);
+            if (board[row][column] != Sudoku.EMPTY_VALUE) {
+                throw new FilledCellException("Unable to place " + number + " at cell " + row + ", " + column +
+                        ": the cell has already a value.");
+            } else {
+                // Just set the number into user's board
+                board[row][column] = number;
+                game = game.setAt0(board);
 
-            throw new NumberAlreadyGuessedException("Number at cell " + row + ", " + column +
-                    " has already been guessed by another player.");
+                throw new NumberAlreadyGuessedException("Number at cell " + row + ", " + column +
+                        " has already been guessed by another player.");
+            }
         } catch (InvalidNumberException e) {
             // Decrement user score
             score += WRONG_NUMBER_SCORE;

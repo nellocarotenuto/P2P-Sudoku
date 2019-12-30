@@ -1,4 +1,4 @@
-package com.github.nellocarotenuto.p2psudoku.challenge;
+package com.github.nellocarotenuto.p2psudoku.sudoku;
 
 /**
  * Models an exception thrown when attempting to modify a cell outside the board.

@@ -1,10 +1,7 @@
 package com.github.nellocarotenuto.p2psudoku.gui;
 
 import com.github.nellocarotenuto.p2psudoku.challenge.*;
-import com.github.nellocarotenuto.p2psudoku.sudoku.FilledCellException;
-import com.github.nellocarotenuto.p2psudoku.sudoku.FixedCellException;
-import com.github.nellocarotenuto.p2psudoku.sudoku.InvalidNumberException;
-import com.github.nellocarotenuto.p2psudoku.sudoku.Sudoku;
+import com.github.nellocarotenuto.p2psudoku.sudoku.*;
 
 import com.googlecode.lanterna.SGR;
 import com.googlecode.lanterna.Symbols;
