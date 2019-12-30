@@ -147,6 +147,10 @@ public class Challenge implements Serializable {
             throw new ChallengeStatusException("Unable to start a challenge if it has already been started earlier.");
         }
 
+        if (games.keySet().size() < 2) {
+            throw new NotEnoughPlayersException("Unable to start a challenge with just a player in it.");
+        }
+
         this.status = ChallengeStatus.PLAYING;
     }
 

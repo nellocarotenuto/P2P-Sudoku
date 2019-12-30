@@ -302,6 +302,18 @@ public class GameClientTests {
     }
 
     @Test
+    @DisplayName("Start challenge with not enough players test")
+    public void testStartChallengeWithNotenoughPlayers() throws Exception {
+        client1.login("Alice");
+
+        client1.createChallenge("Challenge 1", 7, false);
+
+        assertThrows(NotEnoughPlayersException.class, () -> {
+            client1.startChallenge();
+        });
+    }
+
+    @Test
     @DisplayName("Place number test")
     public void testPlaceNumber() throws Exception {
         client1.login("Alice");

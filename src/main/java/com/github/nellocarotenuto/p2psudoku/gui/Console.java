@@ -780,6 +780,9 @@ public class Console {
                         } catch (UnauthorizedOperationException e) {
                             messageColor = TextColor.ANSI.RED;
                             message = String.format("%-35s", properties.getProperty("challenge.messages.unauthorized"));
+                        } catch (NotEnoughPlayersException e) {
+                            messageColor = TextColor.ANSI.RED;
+                            message = String.format("%-35s", properties.getProperty("challenge.messages.notenoughplayers"));
                         }
                     }
                 } else if (input.equals("!quit")) {
